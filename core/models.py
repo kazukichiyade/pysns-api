@@ -7,8 +7,17 @@ from django.contrib.auth.models import (
 from django.conf import settings
 
 
-# EmailとPasswordを使用するためBaseUserManagerをオーバーライドしカスタマイズしたBaseUserManagerクラス
-class BaseUserManager(BaseUserManager):
+def upload_path(instance, filename):
+    ext = filename.split(".")[-1]
+    return "/".join(
+        [
+            "image",
+            str(instance.userPro.id) + str(instance.nickName) + str(".") + str(ext),
+        ]
+    )
+
+
+class UserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
 
         if not email:
@@ -20,8 +29,7 @@ class BaseUserManager(BaseUserManager):
 
         return user
 
-    # Email認証に変更する場合はsuper_userを作成しておいた方が便利
-    def create_super_user(self, email, password):
+    def create_superuser(self, email, password):
         user = self.create_user(email, password)
         user.is_staff = True
         user.is_superuser = True
@@ -30,7 +38,6 @@ class BaseUserManager(BaseUserManager):
         return user
 
 
-# ユーザークラスをオーバーライドしてカスタマイズ
 class User(AbstractBaseUser, PermissionsMixin):
 
     email = models.EmailField(max_length=50, unique=True)
@@ -43,3 +50,45 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.email
+
+
+class Profile(models.Model):
+    nickName = models.CharField(max_length=20)
+    userPro = models.OneToOneField(
+        settings.AUTH_USER_MODEL, related_name="userPro", on_delete=models.CASCADE
+    )
+    created_on = models.DateTimeField(auto_now_add=True)
+    img = models.ImageField(blank=True, null=True, upload_to=upload_path)
+
+    def __str__(self):
+        return self.nickName
+
+
+class FriendRequest(models.Model):
+    askFrom = models.ForeignKey(
+        settings.AUTH_USER_MODEL, related_name="askFrom", on_delete=models.CASCADE
+    )
+    askTo = models.ForeignKey(
+        settings.AUTH_USER_MODEL, related_name="askTo", on_delete=models.CASCADE
+    )
+    approved = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = (("askFrom", "askTo"),)
+
+    def __str__(self):
+        return str(self.askFrom) + "----->" + str(self.askTo)
+
+
+class Message(models.Model):
+
+    message = models.CharField(max_length=140)
+    sender = models.ForeignKey(
+        settings.AUTH_USER_MODEL, related_name="sender", on_delete=models.CASCADE
+    )
+    receiver = models.ForeignKey(
+        settings.AUTH_USER_MODEL, related_name="receiver", on_delete=models.CASCADE
+    )
+
+    def __str__(self):
+        return str(self.sender)

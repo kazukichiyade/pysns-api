@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework.authtoken",
     "core.apps.CoreConfig",
-    "api.user.apps.ApiUserConfig",
+    "api_user.apps.ApiUserConfig",
     "api_dm.apps.ApiDmConfig",
 ]
 
@@ -121,6 +121,9 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
+
+# Coreで定義するユーザーモデルを使用する
+AUTH_USER_MODEL = "core.User"
 
 STATIC_URL = "/static/"
 

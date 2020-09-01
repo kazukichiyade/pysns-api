@@ -11,6 +11,8 @@ djangorestframework = "==3.11.0"
 flake8 = "*"
 black = "*"
 pillow = "*"
+api = "*"
+defaultrouter = "*"
 
 [requires]
 python_version = "3.8"
