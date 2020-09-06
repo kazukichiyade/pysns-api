@@ -10,6 +10,10 @@ django = "==3.0.6"
 djangorestframework = "==3.11.0"
 flake8 = "*"
 black = "*"
+pillow = "*"
+api = "*"
+defaultrouter = "*"
+django-cors-headers = "*"
 
 [requires]
 python_version = "3.8"
